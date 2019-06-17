@@ -1,5 +1,6 @@
 package greenter.sunat.validator.process
 
+import greenter.sunat.validator.model.ErrorLevel
 import greenter.sunat.validator.model.ErrorResult
 import net.sf.saxon.jaxp.TransformerImpl
 import net.sf.saxon.serialize.MessageEmitter
@@ -13,19 +14,21 @@ import javax.xml.transform.stream.StreamResult
 import javax.xml.transform.stream.StreamSource
 
 class SaxonXmlValidator : XmlValidator {
-    override fun validate(xml: String, xsltPath: String): ErrorResult {
+    override fun validate(xml: String, xsltPath: String): List<ErrorResult> {
 
-        try {
-            val warning = transform(xml, xsltPath)
+        return try {
+            transform(xml, xsltPath)
         } catch (e: TransformerException) {
-            e.printStackTrace()
+            val error = ErrorResult()
+            error.code = "-1"
+            error.message = e.message
+            error.level = ErrorLevel.EXCEPTION
 
-            print(e.message)
+            val result = ArrayList<ErrorResult>()
+            result.add(error)
+
+            result
         }
-
-        print("Finished")
-
-        return ErrorResult()
     }
 
     @Throws(TransformerException::class)
@@ -56,10 +59,9 @@ class SaxonXmlValidator : XmlValidator {
             override fun endDocument() {
                 val message = getWriter().toString()
                 val error = ErrorResult()
+                error.message = message
+                error.level = if (this.abort) ErrorLevel.EXCEPTION else ErrorLevel.OBSERVATION
 
-                if (this.abort) {
-                    throw XPathException(message)
-                }
                 listResult.add(error)
 
                 super.endDocument()
@@ -68,13 +70,11 @@ class SaxonXmlValidator : XmlValidator {
             override fun close() {}
         }
 
-        println("Ejecutandose transformerFactory.newTransformer. Despues")
-
         println("Ejecutandose transformer.transform")
         try {
             val fos = ByteArrayOutputStream()
             val out = OutputStreamWriter(fos, "ISO8859_1")
-            transformer.setOutputProperty("encoding", "ISO-8859-1")
+            transformer.setOutputProperty("encoding", StandardCharsets.ISO_8859_1.name())
             transformer.transform(xmlStreamSource, StreamResult(out))
 
             fos.close()
