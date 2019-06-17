@@ -15,4 +15,5 @@ cache:
 
 script:
   - chmod +x ./gradlew
-  - ./gradlew build --scan -s
+  - ./gradlew build -s
+  - ls build/libs
