@@ -21,7 +21,7 @@ class ErrorResultParser : ResultParser {
         error.code = parts[1]
         error.message = parts[2]
 
-        if (parts.count() >= 5) {
+        if (count >= 5) {
             error.nodePath = parts[3]
             error.nodeValue = parts[4]
         }
