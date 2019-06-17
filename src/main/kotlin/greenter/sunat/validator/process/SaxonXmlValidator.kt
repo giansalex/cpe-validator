@@ -1,7 +1,7 @@
 package greenter.sunat.validator.process
 
-import greenter.sunat.validator.model.ErrorLevel
 import greenter.sunat.validator.model.ErrorResult
+import greenter.sunat.validator.parser.ResultParser
 import net.sf.saxon.jaxp.TransformerImpl
 import net.sf.saxon.serialize.MessageEmitter
 import net.sf.saxon.trans.XPathException
@@ -13,19 +13,19 @@ import javax.xml.transform.TransformerFactory
 import javax.xml.transform.stream.StreamResult
 import javax.xml.transform.stream.StreamSource
 
-class SaxonXmlValidator : XmlValidator {
+class SaxonXmlValidator (val resultParser: ResultParser) : XmlValidator {
+
     override fun validate(xml: String, xsltPath: String): List<ErrorResult> {
 
         return try {
             transform(xml, xsltPath)
         } catch (e: TransformerException) {
-            val error = ErrorResult()
-            error.code = "-1"
-            error.message = e.message
-            error.level = ErrorLevel.EXCEPTION
-
             val result = ArrayList<ErrorResult>()
-            result.add(error)
+            val error = resultParser.getResult(e.message)
+
+            if (error != null) {
+                result.add(error)
+            }
 
             result
         }
@@ -58,11 +58,16 @@ class SaxonXmlValidator : XmlValidator {
             @Throws(XPathException::class)
             override fun endDocument() {
                 val message = getWriter().toString()
-                val error = ErrorResult()
-                error.message = message
-                error.level = if (this.abort) ErrorLevel.EXCEPTION else ErrorLevel.OBSERVATION
 
-                listResult.add(error)
+                if (this.abort) {
+                    throw XPathException(message)
+                }
+
+                val error = resultParser.getResult(message)
+
+                if (error != null) {
+                    listResult.add(error)
+                }
 
                 super.endDocument()
             }
