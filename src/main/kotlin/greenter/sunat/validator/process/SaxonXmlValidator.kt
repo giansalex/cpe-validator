@@ -75,7 +75,6 @@ class SaxonXmlValidator (val resultParser: ResultParser) : XmlValidator {
             override fun close() {}
         }
 
-        println("Ejecutandose transformer.transform")
         try {
             val fos = ByteArrayOutputStream()
             val out = OutputStreamWriter(fos, "ISO8859_1")
