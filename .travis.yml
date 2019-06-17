@@ -1,19 +1,24 @@
 language: java
 install: true
-
 jdk:
   - oraclejdk8
-
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
-
 cache:
   directories:
-    - $HOME/.gradle/caches/
-    - $HOME/.gradle/wrapper/
-
+    - "$HOME/.gradle/caches/"
+    - "$HOME/.gradle/wrapper/"
 script:
   - chmod +x ./gradlew
   - ./gradlew build -s
-  - ls build/libs
+
+deploy:
+  provider: releases
+  api_key:
+    secure: bHsJga2FEDxles38tO1xcR4cLuKgEmCrsoESMJJptFqqJzKtpt4Fw2YUMiBLl1OAzx9TiKxZwrz42bG3Dgih85Y1AET+iSWE9PPPfQlvJmC0xyDeE9k1OIRVZSYl8wbvOFkJz3tY1FH4JemnoE29SFq3A6zAIa7/bH/njpcDzoPrLxmN52VuBkN2QKrVQmR7indB61I/frz0djF3dVGffKU3Sz0lpCAAjsextCeOmxfqH3QljcmlIuEfy+ZMz9Mz1YKOh3d1DgKlF/l3jE7YjOP02qQuKkcZPGHwKcON7nzXITuxW3eI/zKFcWYfXT40cG5Rx32zRHw0r5jZNioAv/B5eYOwqZrfmHy2Zar0JYRfCLNfBlixr2onKrEbeO1WZz0t0l+BAG4YaCJ2mic6KJnl8LilST8k4mHNuv64u+iEWdX3Oq1+8EiJR2UDJ62i2t1eiY18/MNdD7xGnQ2l6VY23U/qA2nzsyq1WZucEKC4XigNKf767kFHeO2dzkBZXm6vhuevIXk/vXU/v74+YJL9Spf/eUos632tXVRpR6EibtMO94eBns7+SsesPkX9nCSSVfaPfn+nJd3qFkmfeCrdnex7dPE9k154YrkGIzYmUpvKjDTbx4b/U0Pz3XoAysTH/Pnx61VT0g+K2SqgiKM+06eyxwovJuwUs/4O+Ok=
+  file: build/libs/cpe-validator-${TRAVIS_TAG}.jar
+  skip_cleanup: true
+  on:
+    repo: giansalex/cpe-validator
+    tags: true
