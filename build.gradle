@@ -29,7 +29,9 @@ jar {
     exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.MF'
 
     manifest {
-        attributes 'Main-Class': 'greenter.sunat.validator.MainKt'
+        attributes 'Main-Class': 'greenter.sunat.validator.MainKt',
+                'Implementation-Title': 'CPE Validator',
+                'Implementation-Version': version
     }
 
     // NEW LINE HERE !!!
