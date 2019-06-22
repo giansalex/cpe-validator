@@ -3,19 +3,35 @@ package greenter.sunat.validator.command
 import com.google.gson.Gson
 import greenter.sunat.validator.parser.ErrorResultParser
 import greenter.sunat.validator.process.SaxonXmlValidator
+import greenter.sunat.validator.resolver.XmlDocumentTypeResolver
+import greenter.sunat.validator.resolver.XsltPathResolver
 import picocli.CommandLine.*
+import java.io.File
 
 class Validator : Runnable {
 
-    @Option(names = ["-x", "--xsl-file"], required = true, description = ["Path XSL Sunat Validator"])
-    private var xslFile: String? = null
+    @Option(names = ["-x", "--xsl-dir"], required = true, description = ["Path XSL Directory (Sunat Validator)"])
+    private var xslDirectory: String? = null
 
     @Parameters(index = "0", description = ["XML File to validate"])
     var xmlFile: String? = null
 
     override fun run() {
+
+        val xslResolver = XsltPathResolver(xslDirectory!!)
+        val typeResolver = XmlDocumentTypeResolver()
+        val type = typeResolver.getType(File(xmlFile!!).inputStream())
+
+        if (type == null) {
+            println("Invalid XML or unknow type")
+
+            return
+        }
+
+        val xslFile = xslResolver.getPath(type)
+
         val validator = SaxonXmlValidator(ErrorResultParser())
-        val result = validator.validate(xmlFile!!, xslFile!!)
+        val result = validator.validate(xmlFile!!, xslFile)
 
         val gson = Gson()
 

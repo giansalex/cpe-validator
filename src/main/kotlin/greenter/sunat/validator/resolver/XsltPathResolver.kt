@@ -4,7 +4,7 @@ import greenter.sunat.validator.model.DocumentType
 import java.nio.file.Paths
 
 class XsltPathResolver(private val baseDirectory: String) : PathResolver {
-    override fun getPath(type: DocumentType): String? {
+    override fun getPath(type: DocumentType): String {
 
         val xslFile = when (type) {
             DocumentType.FACTURA -> "2.x/ValidaExprRegFactura-2.0.1.xsl"
