@@ -8,6 +8,7 @@ import net.sf.saxon.trans.XPathException
 import java.io.*
 import java.nio.charset.StandardCharsets
 import java.util.ArrayList
+import javax.xml.transform.ErrorListener
 import javax.xml.transform.TransformerException
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.stream.StreamResult
@@ -34,7 +35,7 @@ class SaxonXmlValidator (val resultParser: ResultParser) : XmlValidator {
     @Throws(TransformerException::class)
     private fun transform(XmlFullPath: String, XsltFullPath: String): List<ErrorResult> {
 
-        val archivoXML = File(XmlFullPath)
+        val xmlFile = File(XmlFullPath)
 
         val xsltStreamSource = getStreamSource(XsltFullPath)
         val xmlStreamSource = getStreamSource(XmlFullPath)
@@ -43,8 +44,13 @@ class SaxonXmlValidator (val resultParser: ResultParser) : XmlValidator {
 
         val listResult = ArrayList<ErrorResult>()
 
-        transformer.setParameter("nombreArchivoEnviado", archivoXML.name)
+        transformer.setParameter("nombreArchivoEnviado", xmlFile.name)
         transformer.underlyingController.recoveryPolicy = 2
+        transformer.errorListener = object : ErrorListener {
+            override fun warning(exception: TransformerException?) {}
+            override fun error(exception: TransformerException?) {}
+            override fun fatalError(exception: TransformerException?) {}
+        }
         transformer.underlyingController.messageEmitter = object : MessageEmitter() {
             var abort = false
 
