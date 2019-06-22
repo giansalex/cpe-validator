@@ -17,10 +17,10 @@ class Validator : Runnable {
     var xmlFile: String? = null
 
     override fun run() {
-        val xslDir = xslDirectory ?: getDefaultXsltDir()
-        System.setProperty("user.dir", getJarPath())
+        val baseXslDir = xslDirectory ?: getJarPath()
+        System.setProperty("user.dir", baseXslDir)
 
-        val xslResolver = XsltPathResolver(xslDir)
+        val xslResolver = XsltPathResolver(getValidationDir(baseXslDir))
         val typeResolver = XmlDocumentTypeResolver()
         val type = typeResolver.getType(File(xmlFile!!).inputStream())
 
@@ -40,10 +40,8 @@ class Validator : Runnable {
         print(gson.toJson(result))
     }
 
-    private fun getDefaultXsltDir(): String {
-        val jarDir = getJarPath()
-
-        return "$jarDir/sunat_archivos/sfs/VALI/commons/xsl/validation"
+    private fun getValidationDir(baseDir: String): String {
+        return "$baseDir/sunat_archivos/sfs/VALI/commons/xsl/validation"
     }
 
     private fun getJarPath(): String {
