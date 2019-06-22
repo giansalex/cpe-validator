@@ -10,20 +10,22 @@ import java.io.File
 
 class Validator : Runnable {
 
-    @Option(names = ["-x", "--xsl-dir"], required = true, description = ["Path XSL Directory (Sunat Validator)"])
+    @Option(names = ["-x", "--xsl-dir"], description = ["Path XSL Directory (Sunat Validator)"])
     private var xslDirectory: String? = null
 
     @Parameters(index = "0", description = ["XML File to validate"])
     var xmlFile: String? = null
 
     override fun run() {
+        val xslDir = xslDirectory ?: getDefaultXsltDir()
+        System.setProperty("user.dir", getJarPath())
 
-        val xslResolver = XsltPathResolver(xslDirectory!!)
+        val xslResolver = XsltPathResolver(xslDir)
         val typeResolver = XmlDocumentTypeResolver()
         val type = typeResolver.getType(File(xmlFile!!).inputStream())
 
         if (type == null) {
-            println("Invalid XML or unknow type")
+            println("Invalid XML or unknow document type")
 
             return
         }
@@ -36,5 +38,15 @@ class Validator : Runnable {
         val gson = Gson()
 
         print(gson.toJson(result))
+    }
+
+    private fun getDefaultXsltDir(): String {
+        val jarDir = getJarPath()
+
+        return "$jarDir/sunat_archivos/sfs/VALI/commons/xsl/validation"
+    }
+
+    private fun getJarPath(): String {
+        return File(javaClass.protectionDomain.codeSource.location.path).parent
     }
 }
