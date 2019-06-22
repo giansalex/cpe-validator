@@ -6,8 +6,9 @@ enum class DocumentType (val value: String) {
     NOTA_CREDITO("07"),
     NOTA_DEBITO("08"),
     RESUMEN_DIARIO("RC"),
-    COMUNICACION_BAJA("RR"),
+    COMUNICACION_BAJA("RA"),
     GUIA_REMISION("09"),
     RETENCION("20"),
     PERCEPCION("40"),
+    REVERSION("RR"),
 }

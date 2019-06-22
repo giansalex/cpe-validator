@@ -37,4 +37,46 @@ class TypeResolverTests {
 
         Assert.assertEquals(DocumentType.NOTA_CREDITO, type)
     }
+
+    @Test
+    fun getTypeVoided() {
+        val xml =
+            """ 
+<?xml version="1.0" encoding="utf-8"?>
+<VoidedDocuments xmlns="urn:sunat:names:specification:ubl:peru:schema:xsd:VoidedDocuments-1" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">
+    <cbc:ID>RA-20190621-001</cbc:ID>
+     <cac:Signature>
+        <cbc:ID>20123456789</cbc:ID>
+        <cac:SignatoryParty>
+            <cac:PartyIdentification>
+                <cbc:ID>20123456789</cbc:ID>
+            </cac:PartyIdentification>
+        </cac:SignatoryParty>
+    </cac:Signature>
+</VoidedDocuments>
+            """.trimIndent()
+
+        val resolver = XmlDocumentTypeResolver()
+
+        val type = resolver.getType(xml.byteInputStream())
+
+        Assert.assertEquals(DocumentType.COMUNICACION_BAJA, type)
+    }
+
+    @Test
+    fun getTypeReversion() {
+        val xml =
+            """ 
+<?xml version="1.0" encoding="utf-8"?>
+<VoidedDocuments xmlns="urn:sunat:names:specification:ubl:peru:schema:xsd:VoidedDocuments-1" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">
+    <cbc:ID>RR-20190621-001</cbc:ID>
+</VoidedDocuments>
+            """.trimIndent()
+
+        val resolver = XmlDocumentTypeResolver()
+
+        val type = resolver.getType(xml.byteInputStream())
+
+        Assert.assertEquals(DocumentType.REVERSION, type)
+    }
 }
