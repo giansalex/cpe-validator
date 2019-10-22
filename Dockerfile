@@ -1,4 +1,4 @@
-FROM alpine:3.9
+FROM alpine:3.10
 LABEL owner="Giancarlos Salas"
 LABEL maintainer="giansalex@gmail.com"
 
